@@ -50,6 +50,8 @@ import android.os.Bundle;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -240,11 +242,13 @@ public class MainActivity extends Activity implements SensorEventListener {
                 Toast.makeText(MainActivity.this, "Recording...", Toast.LENGTH_LONG).show();
 
                 Camera.Parameters params = mCamera.getParameters();
-                params.setPreviewFpsRange( 30000, 30000 ); // 30 fps
+                int[] supported = params.getSupportedPreviewFpsRange().get(0);
+                params.setPreviewFpsRange(supported[0], supported[1]); // 30 fps
                 if ( params.isAutoExposureLockSupported() )
                     params.setAutoExposureLock( true );
 
-                params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                List<String> focuses = params.getSupportedFocusModes();
+                params.setFocusMode(focuses.get(0));
                 mCamera.setParameters(params);
                 //d.beginData();
                 storeData();
@@ -277,13 +281,15 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        if(quality == 0)
+        CamcorderProfile w = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
+        mediaRecorder.setProfile(w);
+        /*if(quality == 0)
             mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_1080P));
         else if(quality == 1)
             mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_720P));
         else if(quality == 2)
             mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_480P));
-
+*/
         //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 
         mediaRecorder.setOutputFile(Environment.getExternalStorageDirectory().getPath()+"/elab/" + timeStampFile + "/" + timeStampFile  + ".mp4");
