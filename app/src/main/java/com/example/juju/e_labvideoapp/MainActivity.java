@@ -173,7 +173,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         LM = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 
         // Register the listener with the Location Manager to receive location updates
-        LM.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        LM.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10, 0, locationListener);
     }
 
     @Override
@@ -224,7 +224,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                 }
 */
             } else {
-                timeStampFile = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                timeStampFile = new SimpleDateFormat("yyyy-MM-dd_HHmmss").format(new Date());
                 File wallpaperDirectory = new File(Environment.getExternalStorageDirectory().getPath()+"/elab/");
                 wallpaperDirectory.mkdirs();
 
@@ -330,6 +330,11 @@ public class MainActivity extends Activity implements SensorEventListener {
     PrintWriter writer = null;
     long timechecker = 5000;
 
+    private String getTimestamp()
+    {
+        return new SimpleDateFormat("HH:mm:ss:SSS").format(new Date());
+    }
+
     class SayHello extends TimerTask {
         public void run() {
             lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -351,13 +356,13 @@ public class MainActivity extends Activity implements SensorEventListener {
             }*/
 
             if(latitude != 0.0) {
-                String timeStamp = new SimpleDateFormat("HH-mm-ss").format(new Date());
+                String timeStamp = getTimestamp();
                 writer.println(longitude + "," + latitude + "," + speed + "," + dist[0] + "," + timeStamp + "," + linear_acc_x + "," + linear_acc_y + "," + linear_acc_z + "," +
                         heading + "," + gyro_x + "," + gyro_y + "," + gyro_z);
             }
             else{
                 dist[0] = (float) 0.0;
-                String timeStamp = new SimpleDateFormat("HH-mm-ss").format(new Date());
+                String timeStamp = getTimestamp();
                 writer.println(longitude_original + "," + latitude_original + "," + speed + "," + dist[0] + "," + timeStamp + "," + linear_acc_x + "," + linear_acc_y + "," + linear_acc_z + "," +
                         heading + "," + gyro_x + "," + gyro_y + "," + gyro_z);
             }
