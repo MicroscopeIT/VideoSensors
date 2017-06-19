@@ -5,8 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 import android.app.Activity;
@@ -106,7 +108,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         String setTextText = "Heading: " + heading + " Speed: " + speed;
         tv.setText(setTextText);
 
-
+        quality = CamcorderProfile.QUALITY_HIGH;
     }
 
 
@@ -135,8 +137,11 @@ public class MainActivity extends Activity implements SensorEventListener {
             finish();
         }
         if (mCamera == null) {
-            mCamera = Camera.open(findBackFacingCamera());
+            int cameraId = findBackFacingCamera();
+            mCamera = Camera.open(cameraId);
             mPreview.refreshCamera(mCamera);
+
+            setSupportedQuality(cameraId);
         }
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         sensorManager.registerListener(this, head, SensorManager.SENSOR_DELAY_GAME);
@@ -243,7 +248,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
                 Camera.Parameters params = mCamera.getParameters();
                 int[] supported = params.getSupportedPreviewFpsRange().get(0);
-                params.setPreviewFpsRange(supported[0], supported[1]); // 30 fps
+                params.setPreviewFpsRange(supported[0], supported[1]);
                 if ( params.isAutoExposureLockSupported() )
                     params.setAutoExposureLock( true );
 
@@ -281,15 +286,8 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        CamcorderProfile w = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
-        mediaRecorder.setProfile(w);
-        /*if(quality == 0)
-            mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_1080P));
-        else if(quality == 1)
-            mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_720P));
-        else if(quality == 2)
-            mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_480P));
-*/
+        mediaRecorder.setProfile(CamcorderProfile.get(quality));
+
         //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 
         mediaRecorder.setOutputFile(Environment.getExternalStorageDirectory().getPath()+"/elab/" + timeStampFile + "/" + timeStampFile  + ".mp4");
@@ -449,37 +447,60 @@ public class MainActivity extends Activity implements SensorEventListener {
         String setTextText = "Heading: " + heading + " Speed: " + speed;
         tv.setText(setTextText);
     }
-    String[] options = {"1080p","720p","480p"};
-    String[] options1 = {"15 Hz","10 Hz"};
-    String[] options2 = {"10 fps","20 fps","30 fps"};
 
+    private String getDescription(List<AbstractMap.SimpleEntry<String,Integer>> options, int value) {
+        for (AbstractMap.SimpleEntry<String,Integer> item : options) {
+            if (item.getValue() == value)
+                return item.getKey();
+        }
+        return "unknown";
+    }
+
+    private String[] getDescriptions(List<AbstractMap.SimpleEntry<String,Integer>> options) {
+        ArrayList<String> res = new ArrayList<String>();
+        for (AbstractMap.SimpleEntry<String,Integer> item : options) {
+            res.add(item.getKey());
+        }
+        return res.toArray(new String[0]);
+    }
+
+    List<AbstractMap.SimpleEntry<String,Integer>> options = new ArrayList<>(Arrays.asList(
+            new AbstractMap.SimpleEntry<>("Highest", CamcorderProfile.QUALITY_HIGH),
+            new AbstractMap.SimpleEntry<>("1080p",CamcorderProfile.QUALITY_1080P),
+            new AbstractMap.SimpleEntry<>("720p",CamcorderProfile.QUALITY_720P),
+            new AbstractMap.SimpleEntry<>("480p",CamcorderProfile.QUALITY_480P)));
+
+    List<AbstractMap.SimpleEntry<String,Integer>> options1 = Arrays.asList(
+            new AbstractMap.SimpleEntry<>("15 Hz", 67),
+            new AbstractMap.SimpleEntry<>("10 Hz", 100));
+
+    List<AbstractMap.SimpleEntry<String,Integer>> options2 = Arrays.asList(
+            new AbstractMap.SimpleEntry<>("10 fps", 10),
+            new AbstractMap.SimpleEntry<>("20 fps", 20),
+            new AbstractMap.SimpleEntry<>("30 fps", 30));
+
+    public void setSupportedQuality(int cameraId)
+    {
+        for (int i=0;i<options.size();i++)
+        {
+            if(!CamcorderProfile.hasProfile(cameraId, options.get(i).getValue())) {
+                options.remove(i);
+                i--;
+            }
+        }
+    }
 
     public void addQuality(View view){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         String setting = new String();
-        if(quality == 0) {
-            setting = "1080p";
-        }
-        else if(quality == 1){
-            setting = "720p";
-        }
-        else if(quality == 2){
-            setting = "480p";
-        }
+        setting = getDescription(options, quality);
         builder.setTitle("Pick Quality, Current setting: " + setting)
-                .setItems(options, new DialogInterface.OnClickListener() {
+                .setItems(getDescriptions(options)
+                        , new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // The 'which' argument contains the index position
                         // of the selected item
-                        if(which == 0){
-                            quality = 0;
-                        }
-                        else if (which == 1){
-                            quality = 1;
-                        }
-                        else if (which == 2){
-                            quality = 2;
-                        }
+                        quality = options.get(which).getValue();
                     }
                 });
         builder.show();
@@ -488,23 +509,13 @@ public class MainActivity extends Activity implements SensorEventListener {
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         String setting = new String();
-        if(rate == 100) {
-            setting = "10 Hz";
-        }
-        else if(rate == 67){
-            setting = "15 Hz";
-        }
+        setting = getDescription(options1, rate);
         builder.setTitle("Pick Data Save Rate, Current setting: " + setting)
-                .setItems(options1, new DialogInterface.OnClickListener() {
+                .setItems(getDescriptions(options1), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // The 'which' argument contains the index position
                         // of the selected item
-                        if(which == 0){
-                            rate = 67 ;
-                        }
-                        else if (which == 1){
-                            rate = 100;
-                        }
+                        rate = options1.get(which).getValue();
                     }
                 });
         builder.show();
@@ -513,29 +524,13 @@ public class MainActivity extends Activity implements SensorEventListener {
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         String setting = new String();
-        if(VideoFrameRate == 10) {
-            setting = "10 fps";
-        }
-        else if(VideoFrameRate == 20){
-            setting = "20 fps";
-        }
-        else if(VideoFrameRate == 30){
-            setting = "30 fps";
-        }
+        setting = getDescription(options2, VideoFrameRate);
         builder.setTitle("Pick Video fps, Current setting: " + setting)
-                .setItems(options2, new DialogInterface.OnClickListener() {
+                .setItems(getDescriptions(options2), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // The 'which' argument contains the index position
                         // of the selected item
-                        if(which == 0){
-                            VideoFrameRate = 10 ;
-                        }
-                        else if (which == 1){
-                            VideoFrameRate = 20;
-                        }
-                        else if (which == 2){
-                            VideoFrameRate = 30;
-                        }
+                        VideoFrameRate = options2.get(which).getValue();
                     }
                 });
         builder.show();
