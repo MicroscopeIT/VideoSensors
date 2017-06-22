@@ -217,6 +217,9 @@ public class MainActivity extends Activity implements SensorEventListener {
                 txt.setTextColor(-16711936);
                 //chrono.setBackgroundColor(0);
                 enddata();
+
+                VideoDataCombiner combiner = new VideoDataCombiner();
+                combiner.CombineAndCreate(lastVideoFilePath, lastDataFilePath);
 /*
                 if(clickFlag == 1){
                     clickFlag = 0;
@@ -256,7 +259,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                 params.setFocusMode(focuses.get(0));
                 mCamera.setParameters(params);
                 //d.beginData();
-                storeData();
+                lastDataFilePath = storeData();
                 chrono.setBase(SystemClock.elapsedRealtime());
 
                 chrono.start();
@@ -289,8 +292,8 @@ public class MainActivity extends Activity implements SensorEventListener {
         mediaRecorder.setProfile(CamcorderProfile.get(quality));
 
         //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-
-        mediaRecorder.setOutputFile(Environment.getExternalStorageDirectory().getPath()+"/elab/" + timeStampFile + "/" + timeStampFile  + ".mp4");
+        lastVideoFilePath = Environment.getExternalStorageDirectory().getPath()+"/elab/" + timeStampFile + "/" + timeStampFile  + ".mp4";
+        mediaRecorder.setOutputFile(lastVideoFilePath);
         mediaRecorder.setVideoFrameRate(VideoFrameRate);
         //mediaRecorder.setMaxDuration(5000);
 
@@ -327,6 +330,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     //float distance = 0;
     float speed = 0;
     float dist[] = {0,0,0};
+    String lastDataFilePath;
+    String lastVideoFilePath;
     PrintWriter writer = null;
     long timechecker = 5000;
 
@@ -372,7 +377,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         }
     }
 
-    public void storeData() {
+    public String storeData() {
 
         String filePath = Environment.getExternalStorageDirectory().getPath()+"/elab/" + timeStampFile + "/" + timeStampFile  +  ".csv";
         try {
@@ -397,6 +402,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             capture.performClick();
         }
         */
+        return filePath;
     }
 
     public void enddata() {
