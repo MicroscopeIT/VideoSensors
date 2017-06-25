@@ -249,6 +249,8 @@ public class MainActivity extends Activity implements SensorEventListener {
                 });
                 Toast.makeText(MainActivity.this, "Recording...", Toast.LENGTH_LONG).show();
 
+                videoStartDate = new Date();
+
                 Camera.Parameters params = mCamera.getParameters();
                 int[] supported = params.getSupportedPreviewFpsRange().get(0);
                 params.setPreviewFpsRange(supported[0], supported[1]);
@@ -334,10 +336,16 @@ public class MainActivity extends Activity implements SensorEventListener {
     String lastVideoFilePath;
     PrintWriter writer = null;
     long timechecker = 5000;
+    Date videoStartDate;
 
     private String getTimestamp()
     {
-        return new SimpleDateFormat("HH:mm:ss:SSS").format(new Date());
+        return getTimestamp(new Date());
+    }
+
+    private String getTimestamp(Date date)
+    {
+        return new SimpleDateFormat("HH:mm:ss:SSS").format(date);
     }
 
     class SayHello extends TimerTask {
@@ -360,20 +368,18 @@ public class MainActivity extends Activity implements SensorEventListener {
                 timer.purge();
             }*/
 
+            String videoTime = getTimestamp(new Date(new Date().getTime() - videoStartDate.getTime()));
             if(latitude != 0.0) {
                 String timeStamp = getTimestamp();
-                writer.println(longitude + "," + latitude + "," + speed + "," + dist[0] + "," + timeStamp + "," + linear_acc_x + "," + linear_acc_y + "," + linear_acc_z + "," +
+                writer.println(videoTime + "," + longitude + "," + latitude + "," + speed + "," + dist[0] + "," + timeStamp + "," + linear_acc_x + "," + linear_acc_y + "," + linear_acc_z + "," +
                         heading + "," + gyro_x + "," + gyro_y + "," + gyro_z);
             }
             else{
                 dist[0] = (float) 0.0;
                 String timeStamp = getTimestamp();
-                writer.println(longitude_original + "," + latitude_original + "," + speed + "," + dist[0] + "," + timeStamp + "," + linear_acc_x + "," + linear_acc_y + "," + linear_acc_z + "," +
+                writer.println(videoTime + "," + longitude_original + "," + latitude_original + "," + speed + "," + dist[0] + "," + timeStamp + "," + linear_acc_x + "," + linear_acc_y + "," + linear_acc_z + "," +
                         heading + "," + gyro_x + "," + gyro_y + "," + gyro_z);
             }
-
-
-
         }
     }
 
@@ -386,7 +392,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             e.printStackTrace();
         }
 
-        writer.println("Longitude" + "," + "Latitude" + "," + "Speed" + "," + "Distance" + "," + "Time" + "," + "Acc X" + "," + "Acc Y" + "," + "Acc Z" + "," + "Heading"
+        writer.println("Video time" + "," + "Longitude" + "," + "Latitude" + "," + "Speed" + "," + "Distance" + "," + "Time" + "," + "Acc X" + "," + "Acc Y" + "," + "Acc Z" + "," + "Heading"
                 + "," + "gyro_x" + "," + "gyro_y" + "," + "gyro_z");
         LocationManager original = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Location original_location = original.getLastKnownLocation(LocationManager.GPS_PROVIDER);
