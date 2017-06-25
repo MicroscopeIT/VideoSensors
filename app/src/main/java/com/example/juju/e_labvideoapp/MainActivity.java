@@ -217,9 +217,6 @@ public class MainActivity extends Activity implements SensorEventListener {
                 txt.setTextColor(-16711936);
                 //chrono.setBackgroundColor(0);
                 enddata();
-
-                VideoDataCombiner combiner = new VideoDataCombiner();
-                combiner.CombineAndCreate(lastVideoFilePath, lastDataFilePath);
 /*
                 if(clickFlag == 1){
                     clickFlag = 0;
