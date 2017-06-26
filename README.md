@@ -33,12 +33,12 @@ At the moment it records the following data,
 
 ### Method 2
 
-- Download the apk file.
-- The name of the file is "app-debug.apk".
+- Download apk file (https://drive.google.com/open?id=0B8HG9CD619ZeMmYtN2pnWHNRM2c).
+- The name of the file is "VideoSensors.apk".
 - Make sure your phone allows installation of apps from unknown sources.
 - Copy the app to your phone memory.
 - Now on the phone, find the app in phone memory and click on it.
-- Andorid will now install.
+- Android will now install.
 
 ## To make changes to code: 
 
