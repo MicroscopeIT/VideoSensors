@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 
 import android.app.Activity;
@@ -27,34 +26,20 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
-import android.telephony.TelephonyManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import android.text.InputType;
-import android.view.inputmethod.EditorInfo;
-import android.view.*; //?
-import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
 
-import android.location.GpsStatus.Listener;
-import android.os.Bundle;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-
 import java.util.List;
-import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -240,11 +225,13 @@ public class MainActivity extends Activity implements SensorEventListener {
                     public void run() {
                         try {
                             mediaRecorder.start();
-                        } catch (final Exception ex) {
+                            Toast.makeText(MainActivity.this, "Recording...", Toast.LENGTH_LONG).show();
+                        }
+                        catch (final Exception ex) {
+                            Toast.makeText(MainActivity.this, "MediaRecorder failed to start:" + ex.getMessage(), Toast.LENGTH_LONG).show();
                         }
                     }
                 });
-                Toast.makeText(MainActivity.this, "Recording...", Toast.LENGTH_LONG).show();
 
                 videoStartDate = new Date();
 
@@ -478,27 +465,27 @@ public class MainActivity extends Activity implements SensorEventListener {
         return res.toArray(new String[0]);
     }
 
-    List<AbstractMap.SimpleEntry<String,Integer>> options = new ArrayList<>(Arrays.asList(
+    List<AbstractMap.SimpleEntry<String,Integer>> qualityOptions = new ArrayList<>(Arrays.asList(
             new AbstractMap.SimpleEntry<>("Highest", CamcorderProfile.QUALITY_HIGH),
             new AbstractMap.SimpleEntry<>("1080p",CamcorderProfile.QUALITY_1080P),
             new AbstractMap.SimpleEntry<>("720p",CamcorderProfile.QUALITY_720P),
             new AbstractMap.SimpleEntry<>("480p",CamcorderProfile.QUALITY_480P)));
 
-    List<AbstractMap.SimpleEntry<String,Integer>> options1 = Arrays.asList(
+    List<AbstractMap.SimpleEntry<String,Integer>> dataRateOptions = Arrays.asList(
             new AbstractMap.SimpleEntry<>("15 Hz", 67),
             new AbstractMap.SimpleEntry<>("10 Hz", 100));
 
-    List<AbstractMap.SimpleEntry<String,Integer>> options2 = Arrays.asList(
+    List<AbstractMap.SimpleEntry<String,Integer>> videoFpsOptions = Arrays.asList(
             new AbstractMap.SimpleEntry<>("10 fps", 10),
             new AbstractMap.SimpleEntry<>("20 fps", 20),
             new AbstractMap.SimpleEntry<>("30 fps", 30));
 
     public void setSupportedQuality(int cameraId)
     {
-        for (int i=0;i<options.size();i++)
+        for (int i = 0; i< qualityOptions.size(); i++)
         {
-            if(!CamcorderProfile.hasProfile(cameraId, options.get(i).getValue())) {
-                options.remove(i);
+            if(!CamcorderProfile.hasProfile(cameraId, qualityOptions.get(i).getValue())) {
+                qualityOptions.remove(i);
                 i--;
             }
         }
@@ -507,14 +494,14 @@ public class MainActivity extends Activity implements SensorEventListener {
     public void addQuality(View view){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         String setting = new String();
-        setting = getDescription(options, quality);
+        setting = getDescription(qualityOptions, quality);
         builder.setTitle("Pick Quality, Current setting: " + setting)
-                .setItems(getDescriptions(options)
+                .setItems(getDescriptions(qualityOptions)
                         , new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // The 'which' argument contains the index position
                         // of the selected item
-                        quality = options.get(which).getValue();
+                        quality = qualityOptions.get(which).getValue();
                     }
                 });
         builder.show();
@@ -523,13 +510,13 @@ public class MainActivity extends Activity implements SensorEventListener {
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         String setting = new String();
-        setting = getDescription(options1, rate);
+        setting = getDescription(dataRateOptions, rate);
         builder.setTitle("Pick Data Save Rate, Current setting: " + setting)
-                .setItems(getDescriptions(options1), new DialogInterface.OnClickListener() {
+                .setItems(getDescriptions(dataRateOptions), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // The 'which' argument contains the index position
                         // of the selected item
-                        rate = options1.get(which).getValue();
+                        rate = dataRateOptions.get(which).getValue();
                     }
                 });
         builder.show();
@@ -538,13 +525,13 @@ public class MainActivity extends Activity implements SensorEventListener {
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         String setting = new String();
-        setting = getDescription(options2, VideoFrameRate);
+        setting = getDescription(videoFpsOptions, VideoFrameRate);
         builder.setTitle("Pick Video fps, Current setting: " + setting)
-                .setItems(getDescriptions(options2), new DialogInterface.OnClickListener() {
+                .setItems(getDescriptions(videoFpsOptions), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // The 'which' argument contains the index position
                         // of the selected item
-                        VideoFrameRate = options2.get(which).getValue();
+                        VideoFrameRate = videoFpsOptions.get(which).getValue();
                     }
                 });
         builder.show();

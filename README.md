@@ -1,12 +1,13 @@
 # VideoSensors modified by MicroscopeIT
 
+The tool will be used to capture video and IMU data simultaneously for object learning purpose. 
+
 The new compiled APK is available at https://drive.google.com/open?id=0B8HG9CD619ZeMmYtN2pnWHNRM2c 
+The video and data files are stored on device's primary storage at elab/<date>.
 
 App that records video and motion data from an android smartphone simultaneously. 
 The app lets you choose the video quality and the rate at which data is saved.
 It can be used to record video and accelerometer, gyroscope, compass, GPS data at the same time.
-
-The video and data files are stored on device's primary storage at elab/<date>.
 
 At the moment it records the following data,
 - Video time
