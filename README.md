@@ -20,6 +20,9 @@ At the moment it records the following data,
 - Accelerometer data - Y axis
 - Accelerometer data - Z axis
 - Heading
+- Heading data - X axis
+- Heading data - Y axis
+- Heading data - Z axis
 - Gyroscope data - X axis
 - Gyroscope data - Y axis
 - Gyroscope data - Z axis
