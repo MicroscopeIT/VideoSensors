@@ -352,17 +352,19 @@ public class MainActivity extends Activity implements SensorEventListener {
                 timer.purge();
             }*/
 
-            String videoTime = getTimestamp(new Date(new Date().getTime() - videoStartDate.getTime()));
+            long videoMilisecondsElapsed = new Date().getTime() - videoStartDate.getTime();
             if(latitude != 0.0) {
                 String timeStamp = getTimestamp();
-                writer.println(videoTime + "," + longitude + "," + latitude + "," + speed + "," + dist[0] + "," + timeStamp + "," + linear_acc_x + "," + linear_acc_y + "," + linear_acc_z + "," +
-                        heading + "," + gyro_x + "," + gyro_y + "," + gyro_z);
+                writer.println(videoMilisecondsElapsed + "," + longitude + "," + latitude + "," + speed + "," + dist[0] + "," + timeStamp + "," + linear_acc_x + "," + linear_acc_y + "," + linear_acc_z + "," +
+                        heading + "," + heading_x + "," + heading_y + "," + heading_z + ","
+                        + gyro_x + "," + gyro_y + "," + gyro_z);
             }
             else{
                 dist[0] = (float) 0.0;
                 String timeStamp = getTimestamp();
-                writer.println(videoTime + "," + longitude_original + "," + latitude_original + "," + speed + "," + dist[0] + "," + timeStamp + "," + linear_acc_x + "," + linear_acc_y + "," + linear_acc_z + "," +
-                        heading + "," + gyro_x + "," + gyro_y + "," + gyro_z);
+                writer.println(videoMilisecondsElapsed + "," + longitude_original + "," + latitude_original + "," + speed + "," + dist[0] + "," + timeStamp + "," + linear_acc_x + "," + linear_acc_y + "," + linear_acc_z + "," +
+                        heading + "," + heading_x + "," + heading_y + "," + heading_z + ","
+                        + gyro_x + "," + gyro_y + "," + gyro_z);
             }
         }
     }
@@ -376,8 +378,10 @@ public class MainActivity extends Activity implements SensorEventListener {
             e.printStackTrace();
         }
 
-        writer.println("Video time" + "," + "Longitude" + "," + "Latitude" + "," + "Speed" + "," + "Distance" + "," + "Time" + "," + "Acc X" + "," + "Acc Y" + "," + "Acc Z" + "," + "Heading"
-                + "," + "gyro_x" + "," + "gyro_y" + "," + "gyro_z");
+        writer.println("Video time" + "," + "Longitude" + "," + "Latitude" + "," + "Speed" + "," + "Distance" + "," + "Time" + ","
+                + "Acc X" + "," + "Acc Y" + "," + "Acc Z" + ","
+                + "Heading" + "," + "Head_x" + "," + "Head_y" + "," + "Head_z" + ","
+                + "Gyro_x" + "," + "Gyro_y" + "," + "Gyro_z");
         LocationManager original = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Location original_location = original.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if(original.getLastKnownLocation(LocationManager.GPS_PROVIDER) != null){
@@ -413,6 +417,9 @@ public class MainActivity extends Activity implements SensorEventListener {
     float linear_acc_z = 0;
 
     float heading = 0;
+    float heading_x = 0;
+    float heading_y = 0;
+    float heading_z = 0;
 
     float gyro_x = 0;
     float gyro_y = 0;
@@ -439,6 +446,9 @@ public class MainActivity extends Activity implements SensorEventListener {
             else{
                 heading = heading + 90;
             }
+            heading_x = event.values[0];
+            heading_y = event.values[1];
+            heading_z = event.values[2];
         }
         else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE){
             gyro_x = event.values[0];
